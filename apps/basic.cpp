@@ -1,10 +1,3 @@
-# Tensor Library
-A header-only library implementing Tensor template class. 
-
-Requires C++ 20 standard.
-
-Basic usage (see `apps/basic.cpp`):
-```cpp
 #include <Tensor.hpp>
 #include <iostream>
 
@@ -21,10 +14,3 @@ int main()
 
     return 0;
 }
-```
-
-Output should be as follows:
-```bash
-$ apps/basic
-pos = {1, 2, 3}
-```
