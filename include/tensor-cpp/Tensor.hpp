@@ -22,7 +22,7 @@ namespace tc
         std::array<ValueType, _size> _values;
 
         // Flattened index = (...((0 x n1 + i1) x n2 + i2) x n3 + i3 ...) x nk + ik (row major order)
-        auto _flatten(std::convertible_to<std::size_t> auto... indices)
+        constexpr auto _flatten(std::convertible_to<std::size_t> auto... indices) const
             requires(sizeof...(indices) == _rank)
         {
             const auto _indices = std::array<std::size_t, _rank>{static_cast<std::size_t>(indices)...};
@@ -82,6 +82,26 @@ namespace tc
             requires(sizeof...(indices) == _rank)
         {
             return _values[_flatten(indices...)];
+        }
+
+        auto begin() noexcept
+        {
+            return _values.begin();
+        }
+
+        auto end() noexcept
+        {
+            return _values.end();
+        }
+
+        auto cbegin() const noexcept
+        {
+            return _values.begin();
+        }
+
+        auto cend() const noexcept
+        {
+            return _values.end();
         }
 
         auto operator+(const Tensor<ValueType, Shapes...> &rTensor) const
