@@ -84,30 +84,52 @@ namespace tc
             return _values[_flatten(indices...)];
         }
 
-        template <std::convertible_to<ValueType> RValueType>
-        auto operator+(const Tensor<RValueType, Shapes...> &rTensor) const
+        auto operator+(const Tensor<ValueType, Shapes...> &rTensor) const
         {
             Tensor<ValueType, Shapes...> sum;
 
             for (std::size_t i = 0; i < size(); i++)
             {
-                sum._values[i] = _values[i] + static_cast<ValueType>(rTensor._values[i]);
+                sum._values[i] = _values[i] + rTensor._values[i];
             }
 
             return sum;
         }
 
-        template <std::convertible_to<ValueType> RValueType>
-        auto operator-(const Tensor<RValueType, Shapes...> &rTensor) const
+        auto operator-(const Tensor<ValueType, Shapes...> &rTensor) const
         {
             Tensor<ValueType, Shapes...> sum;
 
             for (std::size_t i = 0; i < size(); i++)
             {
-                sum._values[i] = _values[i] - static_cast<ValueType>(rTensor._values[i]);
+                sum._values[i] = _values[i] - rTensor._values[i];
             }
 
             return sum;
+        }
+
+        auto operator*(ValueType rScalar) const
+        {
+            Tensor<ValueType, Shapes...> scaled;
+
+            for (std::size_t i = 0; i < size(); i++)
+            {
+                scaled._values[i] = _values[i] * rScalar;
+            }
+
+            return scaled;
+        }
+
+        friend auto operator*(ValueType lScalar, const Tensor<ValueType, Shapes...> &rTensor)
+        {
+            Tensor<ValueType, Shapes...> scaled;
+
+            for (std::size_t i = 0; i < rTensor.size(); i++)
+            {
+                scaled._values[i] = lScalar * rTensor._values[i];
+            }
+
+            return scaled;
         }
     };
 
