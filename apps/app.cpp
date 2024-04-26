@@ -5,10 +5,11 @@ using namespace tc;
 
 int main()
 {
-    Tensor<int> v0;                 // SCALAR
-    Tensor<int, 3> v1;              // VECTOR
-    Tensor<int, 3, 3> v2;           // MATRIX
-    Tensor<int, 3, 3, 3> v3;        // 3D MATRIX
+
+    Tensor<int> v0;          // SCALAR
+    Tensor<int, 3> v1;       // VECTOR
+    Tensor<int, 3, 3> v2;    // MATRIX
+    Tensor<int, 3, 3, 3> v3; // 3D MATRIX
 
     std::cout << "RANKS: \n";
     std::cout << "v0: " << v0.rank() << '\n';
@@ -107,6 +108,41 @@ int main()
     std::cout << "diff2(2, 0) = " << diff2(2, 0) << '\n';
     std::cout << "diff2(2, 1) = " << diff2(2, 1) << '\n';
     std::cout << "diff2(2, 2) = " << diff2(2, 2) << '\n';
+
+    std::cout << "\nSCALED:\n";
+    Tensor sc1 = t1 * 0.5;
+    std::cout << "sc1(0) = " << sc1(0) << '\n';
+    std::cout << "sc1(1) = " << sc1(1) << '\n';
+    std::cout << "sc1(2) = " << sc1(2) << '\n';
+
+    Tensor sc2 = 2.5 * t2;
+    std::cout << "sc2(0, 0) = " << sc2(0, 0) << '\n';
+    std::cout << "sc2(1, 1) = " << sc2(1, 1) << '\n';
+    std::cout << "sc2(2, 2) = " << sc2(2, 2) << '\n';
+
+    std::cout << "\nITERATOR:\n";
+    for (auto v : v1)
+    {
+        std::cout << v << '\n';
+    }
+
+    for (const auto& v : v1)
+    {
+        std::cout << v << '\n';
+    }
+
+    // Modify using the iterator
+    for (auto& v : v1)
+    {
+        v = 3;
+    }
+
+    for (const auto v : v1)
+    {
+        std::cout << v << '\n';
+    }
+    
+
 
     return 0;
 }

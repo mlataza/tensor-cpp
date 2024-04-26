@@ -1,3 +1,3 @@
-add_executable(test test.cpp)
+add_executable(app app.cpp)
 
-target_link_libraries(test tensor-cpp)
+target_link_libraries(app tensor-cpp)

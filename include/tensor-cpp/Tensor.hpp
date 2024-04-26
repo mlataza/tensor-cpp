@@ -9,10 +9,8 @@
 
 namespace tc
 {
-    template <typename ValueType>
-    concept is_arithmetic = std::is_arithmetic_v<ValueType>;
-
-    template <is_arithmetic ValueType, std::size_t... Shapes>
+    template <typename ValueType, std::size_t... Shapes>
+        requires(std::is_arithmetic_v<ValueType>)
     class Tensor
     {
         static constexpr auto _size = (Shapes * ... * 1);
