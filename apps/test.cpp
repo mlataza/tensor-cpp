@@ -52,8 +52,61 @@ int main()
     std::cout << "v3(1, 0, 0) = " << v3(1, 0, 0) << '\n';
     std::cout << "v3(0, 0, 1) = " << v3(0, 0, 1) << '\n';
 
-    Tensor<int, 3> t1(1, 2, 3);
+    std::cout << "\nCONSTRUCTOR:\n";
+    Tensor<int, 3> t1(4, 5, 6);
+    std::cout << "t1(0) = " << t1(0) << '\n';
+    std::cout << "t1(1) = " << t1(1) << '\n';
+    std::cout << "t1(2) = " << t1(2) << '\n';
 
+    Tensor<int, 3, 3> t2(4, 5, 6, 4, 5, 6, 4, 5, 6);
+    std::cout << "t2(0, 0) = " << t2(0, 0) << '\n';
+    std::cout << "t2(0, 1) = " << t2(0, 1) << '\n';
+    std::cout << "t2(0, 2) = " << t2(0, 2) << '\n';
+    std::cout << "t2(1, 0) = " << t2(1, 0) << '\n';
+    std::cout << "t2(1, 1) = " << t2(1, 1) << '\n';
+    std::cout << "t2(1, 2) = " << t2(1, 2) << '\n';
+    std::cout << "t2(2, 0) = " << t2(2, 0) << '\n';
+    std::cout << "t2(2, 1) = " << t2(2, 1) << '\n';
+    std::cout << "t2(2, 2) = " << t2(2, 2) << '\n';
+
+    Tensor<int, 3> tt1(1.0f);
+    std::cout << "tt1(0) = " << tt1(0) << '\n';
+    std::cout << "tt1(1) = " << tt1(1) << '\n';
+    std::cout << "tt1(2) = " << tt1(2) << '\n';
+
+    std::cout << "\nSUM:\n";
+    Tensor sum1 = t1 + v1;
+    std::cout << "sum1(0) = " << sum1(0) << '\n';
+    std::cout << "sum1(1) = " << sum1(1) << '\n';
+    std::cout << "sum1(2) = " << sum1(2) << '\n';
+
+    Tensor sum2 = t2 + v2;
+    std::cout << "sum2(0, 0) = " << sum2(0, 0) << '\n';
+    std::cout << "sum2(0, 1) = " << sum2(0, 1) << '\n';
+    std::cout << "sum2(0, 2) = " << sum2(0, 2) << '\n';
+    std::cout << "sum2(1, 0) = " << sum2(1, 0) << '\n';
+    std::cout << "sum2(1, 1) = " << sum2(1, 1) << '\n';
+    std::cout << "sum2(1, 2) = " << sum2(1, 2) << '\n';
+    std::cout << "sum2(2, 0) = " << sum2(2, 0) << '\n';
+    std::cout << "sum2(2, 1) = " << sum2(2, 1) << '\n';
+    std::cout << "sum2(2, 2) = " << sum2(2, 2) << '\n';
+
+    std::cout << "\nDIFFERENCE:\n";
+    Tensor diff1 = t1 - v1;
+    std::cout << "diff1(0) = " << diff1(0) << '\n';
+    std::cout << "diff1(1) = " << diff1(1) << '\n';
+    std::cout << "diff1(2) = " << diff1(2) << '\n';
+
+    Tensor diff2 = t2 - v2;
+    std::cout << "diff2(0, 0) = " << diff2(0, 0) << '\n';
+    std::cout << "diff2(0, 1) = " << diff2(0, 1) << '\n';
+    std::cout << "diff2(0, 2) = " << diff2(0, 2) << '\n';
+    std::cout << "diff2(1, 0) = " << diff2(1, 0) << '\n';
+    std::cout << "diff2(1, 1) = " << diff2(1, 1) << '\n';
+    std::cout << "diff2(1, 2) = " << diff2(1, 2) << '\n';
+    std::cout << "diff2(2, 0) = " << diff2(2, 0) << '\n';
+    std::cout << "diff2(2, 1) = " << diff2(2, 1) << '\n';
+    std::cout << "diff2(2, 2) = " << diff2(2, 2) << '\n';
 
     return 0;
 }

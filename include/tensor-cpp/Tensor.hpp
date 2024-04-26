@@ -17,14 +17,14 @@ namespace tc
     {
         static constexpr auto _size = (Shapes * ... * 1);
         static constexpr auto _rank = sizeof...(Shapes);
+        static constexpr auto _shapes = std::array<std::size_t, _rank>{Shapes...};
 
         std::array<ValueType, _size> _values;
 
-        // Flattened index = (...((0 x n1 + i1) x n2 + i2) x n3 + i3 ...) x nk + ik (row major)
+        // Flattened index = (...((0 x n1 + i1) x n2 + i2) x n3 + i3 ...) x nk + ik (row major order)
         auto _flatten(std::convertible_to<std::size_t> auto... indices)
             requires(sizeof...(indices) == _rank)
         {
-            static constexpr auto _shapes = std::array<std::size_t, _rank>{Shapes...};
             const auto _indices = std::array<std::size_t, _rank>{static_cast<std::size_t>(indices)...};
 
             std::size_t index = 0;
@@ -46,12 +46,20 @@ namespace tc
         }
 
     public:
-        Tensor() : _values{} {}
+        explicit Tensor() : _values{} {}
 
-        Tensor(std::same_as<ValueType> auto... values)
+        explicit Tensor(std::same_as<ValueType> auto... values)
             requires(sizeof...(values) == _size)
             : _values{values...}
         {
+        }
+
+        explicit Tensor(ValueType value)
+        {
+            for (auto &val : _values)
+            {
+                val = value;
+            }
         }
 
         constexpr auto rank() const noexcept
@@ -74,6 +82,32 @@ namespace tc
             requires(sizeof...(indices) == _rank)
         {
             return _values[_flatten(indices...)];
+        }
+
+        template <std::convertible_to<ValueType> RValueType>
+        auto operator+(const Tensor<RValueType, Shapes...> &rTensor) const
+        {
+            Tensor<ValueType, Shapes...> sum;
+
+            for (std::size_t i = 0; i < size(); i++)
+            {
+                sum._values[i] = _values[i] + static_cast<ValueType>(rTensor._values[i]);
+            }
+
+            return sum;
+        }
+
+        template <std::convertible_to<ValueType> RValueType>
+        auto operator-(const Tensor<RValueType, Shapes...> &rTensor) const
+        {
+            Tensor<ValueType, Shapes...> sum;
+
+            for (std::size_t i = 0; i < size(); i++)
+            {
+                sum._values[i] = _values[i] - static_cast<ValueType>(rTensor._values[i]);
+            }
+
+            return sum;
         }
     };
 
