@@ -66,7 +66,7 @@ namespace tc
 
         static constexpr auto shapes_array = sequence::to_array<shapes_sequence_type>::value;
 
-        template <std::size_t... N>
+        template <index_type... N>
         static constexpr auto from_sequence(std::index_sequence<N...>)
         {
             return tensor<ValueType, N...>{};
@@ -186,7 +186,7 @@ namespace tc
             return scaled;
         }
 
-        constexpr auto shape(std::size_t dimension) const noexcept
+        constexpr auto shape(index_type dimension) const noexcept
         {
             return shapes_array.at(dimension);
         }
