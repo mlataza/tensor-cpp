@@ -60,7 +60,7 @@ namespace tc
         using value_type = ValueType;
         using index_type = std::size_t;
         using shapes_sequence_type = std::index_sequence<Shapes...>;
-        using shapes_type = std::array<index_type, shapes_sequence_type::size()>;
+        using indices_type = std::array<index_type, shapes_sequence_type::size()>;
         using container_type = std::array<value_type, container_size>;
         using order_type = row_major_order<shapes_sequence_type::size()>;
 
@@ -98,7 +98,7 @@ namespace tc
         constexpr auto &operator()(std::convertible_to<index_type> auto... indices)
             requires(sizeof...(indices) == shapes_sequence_type::size())
         {
-            return _values[order_type::flatten(shapes(), shapes_type{static_cast<index_type>(indices)...})];
+            return _values[order_type::flatten(shapes(), indices_type{static_cast<index_type>(indices)...})];
         }
 
         constexpr const auto &operator()(std::convertible_to<index_type> auto... indices) const
@@ -114,7 +114,7 @@ namespace tc
 
         constexpr const auto &operator[](index_type index) const
         {
-            return *this[index];
+            return _values[index];
         }
 
         auto begin() noexcept
@@ -229,6 +229,61 @@ namespace tc
 
                 // Copy value to result
                 out[j] = _values[i];
+            }
+
+            return out;
+        }
+
+        template <index_type... RShapes,
+                  typename rhs_shapes_sequence_type = std::index_sequence<RShapes...>,
+                  typename lhs_trim_shapes_sequence_type = sequence::trim_last<shapes_sequence_type>::type,
+                  typename rhs_trim_shapes_sequence_type = sequence::trim_first<rhs_shapes_sequence_type>::type,
+                  typename out_shapes_sequence_type = sequence::cat<lhs_trim_shapes_sequence_type, rhs_trim_shapes_sequence_type>::type>
+            requires((Shapes, ...) == sequence::first<rhs_shapes_sequence_type>::value)
+        auto operator*(const tensor<value_type, RShapes...> &rhs) const noexcept
+        {
+            const auto common_shape = (Shapes, ...);
+            const auto lhs_shapes = sequence::to_array<lhs_trim_shapes_sequence_type>::value;
+            const auto rhs_shapes = sequence::to_array<rhs_trim_shapes_sequence_type>::value;
+            const auto lhs_size = size() / common_shape;
+            const auto rhs_size = rhs.size() / common_shape;
+
+            auto out = from_sequence(out_shapes_sequence_type{});
+            std::array<index_type, out_shapes_sequence_type::size()> out_indices;
+            indices_type lhs_indices;
+            std::array<index_type, sizeof...(RShapes)> rhs_indices;
+
+            // Perform tensor multiplication
+            for (index_type i = 0; i < lhs_size; i++)
+            {
+                auto lhs_trim_indices = row_major_order<lhs_trim_shapes_sequence_type::size()>::expand(lhs_shapes, i);
+
+                for (index_type j = 0; j < rhs_size; j++)
+                {
+                    auto rhs_trim_indices = row_major_order<rhs_trim_shapes_sequence_type::size()>::expand(rhs_shapes, j);
+
+                    value_type value{};
+
+                    for (index_type k = 0; k < common_shape; k++)
+                    {
+                        std::copy(lhs_trim_indices.begin(), lhs_trim_indices.end(), lhs_indices.begin());
+                        *(lhs_indices.end() - 1) = k;
+
+                        std::copy(rhs_trim_indices.begin(), rhs_trim_indices.end(), rhs_indices.begin() + 1);
+                        *(rhs_indices.begin()) = k;
+
+                        auto ii = order_type::flatten(shapes(), lhs_indices);
+                        auto jj = row_major_order<sizeof...(RShapes)>::flatten(rhs.shapes(), rhs_indices);
+
+                        value += _values[ii] * rhs[jj];
+                    }
+
+                    std::copy(lhs_trim_indices.begin(), lhs_trim_indices.end(), out_indices.begin());
+                    std::copy(rhs_trim_indices.begin(), rhs_trim_indices.end(), out_indices.begin() + lhs_trim_indices.size());
+
+                    auto index = row_major_order<out_shapes_sequence_type::size()>::flatten(out.shapes(), out_indices);
+                    out[index] = value;
+                }
             }
 
             return out;

@@ -37,3 +37,7 @@ add_test(NAME shapes COMMAND shapes)
 add_executable(transpose transpose.cpp)
 target_link_libraries(transpose tensor-cpp)
 add_test(NAME transpose COMMAND transpose)
+
+add_executable(multiplication multiplication.cpp)
+target_link_libraries(multiplication tensor-cpp)
+add_test(NAME multiplication COMMAND multiplication)

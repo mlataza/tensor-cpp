@@ -66,6 +66,39 @@ namespace tc::sequence
         using seq0123 = cat<seq012, seq3>::type;
         using type = cat<seq0123, seq4>::type;
     };
+
+    template <typename Seq>
+    struct first;
+
+    template <std::size_t First, std::size_t... N>
+    struct first<std::index_sequence<First, N...>>
+    {
+        static constexpr auto value = First;
+    };
+
+    template <typename Seq>
+    struct trim_last;
+
+    template <std::size_t... N>
+    struct trim_last<std::index_sequence<N...>>
+    {
+        using type = get<std::index_sequence<N...>, std::make_index_sequence<sizeof...(N) - 1>>::type;
+    };
+
+    template <>
+    struct trim_last<std::index_sequence<>>
+    {
+        using type = std::index_sequence<>;
+    };
+
+    template <typename Seq>
+    struct trim_first;
+
+    template <std::size_t First, std::size_t... N>
+    struct trim_first<std::index_sequence<First, N...>>
+    {
+        using type = std::index_sequence<N...>;
+    };
 }
 
 #endif
