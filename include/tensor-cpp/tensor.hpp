@@ -57,10 +57,11 @@ namespace tc
     {
         static constexpr auto container_size = (Shapes * ... * 1);
 
+        using value_type = ValueType;
         using index_type = std::size_t;
         using shapes_sequence_type = std::index_sequence<Shapes...>;
         using shapes_type = std::array<index_type, shapes_sequence_type::size()>;
-        using container_type = std::array<ValueType, container_size>;
+        using container_type = std::array<value_type, container_size>;
         using order_type = row_major_order<shapes_sequence_type::size()>;
 
         static constexpr auto shapes_array = sequence::to_array<shapes_sequence_type>::value;
@@ -68,18 +69,18 @@ namespace tc
         template <index_type... N>
         static constexpr auto from_sequence(std::index_sequence<N...>)
         {
-            return tensor<ValueType, N...>{};
+            return tensor<value_type, N...>{};
         }
 
         explicit tensor() : _values{} {}
 
-        explicit tensor(std::same_as<ValueType> auto... values)
+        explicit tensor(std::same_as<value_type> auto... values)
             requires(sizeof...(values) == container_size)
             : _values{values...}
         {
         }
 
-        explicit tensor(ValueType value)
+        explicit tensor(value_type value)
         {
             std::fill(_values.begin(), _values.end(), value);
         }
@@ -136,9 +137,9 @@ namespace tc
             return _values.cend();
         }
 
-        auto operator+(const tensor<ValueType, Shapes...> &rhs) const
+        auto operator+(const tensor<value_type, Shapes...> &rhs) const
         {
-            tensor<ValueType, Shapes...> out;
+            tensor<value_type, Shapes...> out;
 
             for (auto ot = out.begin(), lt = cbegin(), rt = rhs.cbegin(); ot != out.end(); ot++, lt++, rt++)
             {
@@ -148,9 +149,9 @@ namespace tc
             return out;
         }
 
-        auto operator-(const tensor<ValueType, Shapes...> &rhs) const
+        auto operator-(const tensor<value_type, Shapes...> &rhs) const
         {
-            tensor<ValueType, Shapes...> out;
+            tensor<value_type, Shapes...> out;
 
             for (auto ot = out.begin(), lt = cbegin(), rt = rhs.cbegin(); ot != out.end(); ot++, lt++, rt++)
             {
@@ -160,9 +161,9 @@ namespace tc
             return out;
         }
 
-        auto operator*(ValueType rhs) const
+        auto operator*(value_type rhs) const
         {
-            tensor<ValueType, Shapes...> out;
+            tensor<value_type, Shapes...> out;
 
             for (auto ot = out.begin(), lt = cbegin(); ot != out.end(); ot++, lt++)
             {
@@ -172,9 +173,9 @@ namespace tc
             return out;
         }
 
-        friend auto operator*(ValueType lhs, const tensor<ValueType, Shapes...> &rhs)
+        friend auto operator*(value_type lhs, const tensor<value_type, Shapes...> &rhs)
         {
-            tensor<ValueType, Shapes...> out;
+            tensor<value_type, Shapes...> out;
 
             for (auto ot = out.begin(), rt = rhs.cbegin(); ot != out.end(); ot++, rt++)
             {
@@ -184,9 +185,9 @@ namespace tc
             return out;
         }
 
-        auto operator/(ValueType rhs) const
+        auto operator/(value_type rhs) const
         {
-            tensor<ValueType, Shapes...> out;
+            tensor<value_type, Shapes...> out;
 
             for (auto ot = out.begin(), lt = cbegin(); ot != out.end(); ot++, lt++)
             {
