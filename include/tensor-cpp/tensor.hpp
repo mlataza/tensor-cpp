@@ -136,52 +136,52 @@ namespace tc
             return _values.cend();
         }
 
-        auto operator+(const tensor<ValueType, Shapes...> &rTensor) const
+        auto operator+(const tensor<ValueType, Shapes...> &rhs) const
         {
-            tensor<ValueType, Shapes...> sum;
+            tensor<ValueType, Shapes...> out;
 
-            for (auto ot = sum.begin(), lt = cbegin(), rt = rTensor.cbegin(); ot != sum.end(); ot++, lt++, rt++)
+            for (auto ot = out.begin(), lt = cbegin(), rt = rhs.cbegin(); ot != out.end(); ot++, lt++, rt++)
             {
                 *ot = *lt + *rt;
             }
 
-            return sum;
+            return out;
         }
 
-        auto operator-(const tensor<ValueType, Shapes...> &rTensor) const
+        auto operator-(const tensor<ValueType, Shapes...> &rhs) const
         {
-            tensor<ValueType, Shapes...> diff;
+            tensor<ValueType, Shapes...> out;
 
-            for (auto ot = diff.begin(), lt = cbegin(), rt = rTensor.cbegin(); ot != diff.end(); ot++, lt++, rt++)
+            for (auto ot = out.begin(), lt = cbegin(), rt = rhs.cbegin(); ot != out.end(); ot++, lt++, rt++)
             {
                 *ot = *lt - *rt;
             }
 
-            return diff;
+            return out;
         }
 
-        auto operator*(ValueType rScalar) const
+        auto operator*(ValueType rhs) const
         {
-            tensor<ValueType, Shapes...> scaled;
+            tensor<ValueType, Shapes...> out;
 
-            for (auto ot = scaled.begin(), lt = cbegin(); ot != scaled.end(); ot++, lt++)
+            for (auto ot = out.begin(), lt = cbegin(); ot != out.end(); ot++, lt++)
             {
-                *ot = *lt * rScalar;
+                *ot = *lt * rhs;
             }
 
-            return scaled;
+            return out;
         }
 
-        friend auto operator*(ValueType lScalar, const tensor<ValueType, Shapes...> &rTensor)
+        friend auto operator*(ValueType lhs, const tensor<ValueType, Shapes...> &rhs)
         {
-            tensor<ValueType, Shapes...> scaled;
+            tensor<ValueType, Shapes...> out;
 
-            for (auto ot = scaled.begin(), rt = rTensor.cbegin(); ot != scaled.end(); ot++, rt++)
+            for (auto ot = out.begin(), rt = rhs.cbegin(); ot != out.end(); ot++, rt++)
             {
-                *ot = lScalar * *rt;
+                *ot = lhs * *rt;
             }
 
-            return scaled;
+            return out;
         }
 
         constexpr auto shape(index_type dimension) const noexcept
