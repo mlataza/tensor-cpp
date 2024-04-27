@@ -36,5 +36,12 @@ int main()
     assert(sc3(2, 1) == 15);
     assert(sc3(2, 2) == 18);
 
+    tensor<double, 3> t3(3.0, 4.0, 5.0);
+
+    tensor sc4 = t3 / 2.0;
+    assert(sc4(0) == 1.5);
+    assert(sc4(1) == 2.0);
+    assert(sc4(2) == 2.5);
+
     return 0;
 }

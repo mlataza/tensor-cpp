@@ -184,6 +184,18 @@ namespace tc
             return out;
         }
 
+        auto operator/(ValueType rhs) const
+        {
+            tensor<ValueType, Shapes...> out;
+
+            for (auto ot = out.begin(), lt = cbegin(); ot != out.end(); ot++, lt++)
+            {
+                *ot = *lt / rhs;
+            }
+
+            return out;
+        }
+
         constexpr auto shape(index_type dimension) const noexcept
         {
             return shapes()[dimension];
