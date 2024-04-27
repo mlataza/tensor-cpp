@@ -197,10 +197,10 @@ namespace tc
         template <index_type Dim0, index_type Dim1,
                   typename shapes_index_sequence_type = std::make_index_sequence<shapes_sequence_type::size()>,
                   typename transposed_shapes_index_sequence_type = sequence::transpose<Dim0, Dim1, shapes_index_sequence_type>::type,
-                  typename result_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type>
+                  typename out_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type>
         auto transpose() const noexcept
         {
-            auto result = from_sequence(result_shapes_sequence_type{});
+            auto out = from_sequence(out_shapes_sequence_type{});
 
             // Perform the transposition
             for (index_type i = 0; i < size(); i++)
@@ -212,13 +212,13 @@ namespace tc
                 std::swap(indices[Dim0], indices[Dim1]);
 
                 // Compute the new index for the result
-                auto j = order_type::flatten(result.shapes(), indices);
+                auto j = decltype(out)::order_type::flatten(out.shapes(), indices);
 
                 // Copy value to result
-                result[j] = _values[i];
+                out[j] = _values[i];
             }
 
-            return result;
+            return out;
         }
 
     private:
