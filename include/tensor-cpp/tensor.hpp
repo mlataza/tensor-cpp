@@ -197,7 +197,7 @@ namespace tc
         }
 
         template <index_type Dim0, index_type Dim1,
-                  typename dimension_sequence_type = sequence::transpose<Dim0, Dim1, shapes_sequence_type>::type,
+                  typename dimension_sequence_type = sequence::transpose<Dim0, Dim1, std::make_index_sequence<shapes_sequence_type::size()>>::type,
                   typename result_shapes_sequence_type = sequence::get<shapes_sequence_type, dimension_sequence_type>::type>
         auto transpose() const noexcept
         {
