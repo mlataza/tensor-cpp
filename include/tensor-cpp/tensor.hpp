@@ -4,7 +4,6 @@
 #include <array>
 #include <concepts>
 #include <iostream>
-#include <functional>
 
 #include "sequence.hpp"
 
@@ -104,7 +103,7 @@ namespace tc
         constexpr const auto &operator()(std::convertible_to<index_type> auto... indices) const
             requires(sizeof...(indices) == shapes_sequence_type::size())
         {
-            return _values[order_type::flatten(shapes_array, shapes_type{static_cast<index_type>(indices)...})];
+            return *this(indices...);
         }
 
         constexpr auto &operator[](index_type index)
@@ -114,7 +113,7 @@ namespace tc
 
         constexpr const auto &operator[](index_type index) const
         {
-            return _values[index];
+            return *this[index];
         }
 
         auto begin() noexcept
@@ -129,29 +128,22 @@ namespace tc
 
         auto cbegin() const noexcept
         {
-            return _values.begin();
+            return _values.cbegin();
         }
 
         auto cend() const noexcept
         {
-            return _values.end();
-        }
-
-        template <typename Func>
-        auto apply(Func &&func) noexcept
-        {
-            for (index_type i = 0; i < size(); i++)
-            {
-                _values[i] = std::invoke(func, _values[i], i);
-            }
+            return _values.cend();
         }
 
         auto operator+(const tensor<ValueType, Shapes...> &rTensor) const
         {
             tensor<ValueType, Shapes...> sum;
 
-            sum.apply([&rTensor, this](ValueType value, index_type i)
-                      { return _values[i] + rTensor._values[i]; });
+            for (auto ot = sum.begin(), lt = cbegin(), rt = rTensor.cbegin(); ot != sum.end(); ot++, lt++, rt++)
+            {
+                *ot = *lt + *rt;
+            }
 
             return sum;
         }
@@ -160,8 +152,10 @@ namespace tc
         {
             tensor<ValueType, Shapes...> diff;
 
-            diff.apply([&rTensor, this](ValueType value, index_type i)
-                       { return _values[i] - rTensor._values[i]; });
+            for (auto ot = diff.begin(), lt = cbegin(), rt = rTensor.cbegin(); ot != diff.end(); ot++, lt++, rt++)
+            {
+                *ot = *lt - *rt;
+            }
 
             return diff;
         }
@@ -170,8 +164,10 @@ namespace tc
         {
             tensor<ValueType, Shapes...> scaled;
 
-            scaled.apply([rScalar, this](ValueType value, index_type i)
-                         { return _values[i] * rScalar; });
+            for (auto ot = scaled.begin(), lt = cbegin(); ot != scaled.end(); ot++, lt++)
+            {
+                *ot = *lt * rScalar;
+            }
 
             return scaled;
         }
@@ -180,8 +176,10 @@ namespace tc
         {
             tensor<ValueType, Shapes...> scaled;
 
-            scaled.apply([lScalar, &rTensor](ValueType value, index_type i)
-                         { return lScalar * rTensor._values[i]; });
+            for (auto ot = scaled.begin(), rt = rTensor.cbegin(); ot != scaled.end(); ot++, rt++)
+            {
+                *ot = lScalar * *rt;
+            }
 
             return scaled;
         }
@@ -197,8 +195,9 @@ namespace tc
         }
 
         template <index_type Dim0, index_type Dim1,
-                  typename dimension_sequence_type = sequence::transpose<Dim0, Dim1, std::make_index_sequence<shapes_sequence_type::size()>>::type,
-                  typename result_shapes_sequence_type = sequence::get<shapes_sequence_type, dimension_sequence_type>::type>
+                  typename shapes_index_sequence_type = std::make_index_sequence<shapes_sequence_type::size()>,
+                  typename transposed_shapes_index_sequence_type = sequence::transpose<Dim0, Dim1, shapes_index_sequence_type>::type,
+                  typename result_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type>
         auto transpose() const noexcept
         {
             auto result = from_sequence(result_shapes_sequence_type{});
