@@ -35,10 +35,8 @@ namespace tc
             return index;
         }
 
-        static auto expand(const array_type &shapes, index_type index)
+        static auto expand(const array_type &shapes, index_type index, array_type& indices)
         {
-            array_type indices;
-
             for (auto k = indices.size(); k > 0; k--)
             {
                 auto i = k - 1;
@@ -46,8 +44,6 @@ namespace tc
                 indices[i] = index % shapes[i];
                 index /= shapes[i];
             }
-
-            return indices;
         }
     };
 
@@ -214,12 +210,13 @@ namespace tc
         auto transpose() const noexcept
         {
             auto out = from_sequence(out_shapes_sequence_type{});
+            indices_type indices;
 
             // Perform the transposition
             for (index_type i = 0; i < size(); i++)
             {
                 // Get the indices from index
-                auto indices = order_type::expand(shapes(), i);
+                order_type::expand(shapes(), i, indices);
 
                 // Swap the indices of Dim0 and Dim1
                 std::swap(indices[Dim0], indices[Dim1]);
@@ -252,15 +249,17 @@ namespace tc
             std::array<index_type, out_shapes_sequence_type::size()> out_indices;
             indices_type lhs_indices;
             std::array<index_type, sizeof...(RShapes)> rhs_indices;
+            std::array<index_type, lhs_trim_shapes_sequence_type::size()> lhs_trim_indices;
+            std::array<index_type, rhs_trim_shapes_sequence_type::size()> rhs_trim_indices;
 
             // Perform tensor multiplication
             for (index_type i = 0; i < lhs_size; i++)
             {
-                auto lhs_trim_indices = row_major_order<lhs_trim_shapes_sequence_type::size()>::expand(lhs_shapes, i);
+                row_major_order<lhs_trim_shapes_sequence_type::size()>::expand(lhs_shapes, i, lhs_trim_indices);
 
                 for (index_type j = 0; j < rhs_size; j++)
                 {
-                    auto rhs_trim_indices = row_major_order<rhs_trim_shapes_sequence_type::size()>::expand(rhs_shapes, j);
+                    row_major_order<rhs_trim_shapes_sequence_type::size()>::expand(rhs_shapes, j, rhs_trim_indices);
 
                     value_type value{};
 
