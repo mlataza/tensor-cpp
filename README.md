@@ -1,18 +1,18 @@
 # Tensor Library
-A header-only library implementing Tensor template class. 
+A header-only library implementing tensor template class. 
 
 Requires C++ 20 standard.
 
 Basic usage (see `apps/basic.cpp`):
 ```cpp
-#include <Tensor.hpp>
+#include <tensor.hpp>
 #include <iostream>
 
 using namespace tc;
 
 int main()
 {
-    Tensor<double, 3> pos{1.0, 2.0, 3.0};
+    tensor<double, 3> pos{1.0, 2.0, 3.0};
 
     std::cout << "pos = {" 
               << pos(0) << ", " 

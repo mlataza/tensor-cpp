@@ -1,4 +1,4 @@
-#include <Tensor.hpp>
+#include <tensor.hpp>
 
 #include <cassert>
 
@@ -6,10 +6,10 @@ using namespace tc;
 
 int main()
 {
-    Tensor<int> v0;          // SCALAR
-    Tensor<int, 3> v1;       // VECTOR
-    Tensor<int, 3, 3> v2;    // MATRIX
-    Tensor<int, 3, 3, 3> v3; // 3D MATRIX
+    tensor<int> v0;          // SCALAR
+    tensor<int, 3> v1;       // VECTOR
+    tensor<int, 3, 3> v2;    // MATRIX
+    tensor<int, 3, 3, 3> v3; // 3D MATRIX
 
     v0() = 1;
     assert(v0() == 1);

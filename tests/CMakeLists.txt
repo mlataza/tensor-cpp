@@ -29,3 +29,11 @@ add_test(NAME scaled COMMAND scaled)
 add_executable(iterator iterator.cpp)
 target_link_libraries(iterator tensor-cpp)
 add_test(NAME iterator COMMAND iterator)
+
+add_executable(shapes shapes.cpp)
+target_link_libraries(shapes tensor-cpp)
+add_test(NAME shapes COMMAND shapes)
+
+add_executable(transpose transpose.cpp)
+target_link_libraries(transpose tensor-cpp)
+add_test(NAME transpose COMMAND transpose)
