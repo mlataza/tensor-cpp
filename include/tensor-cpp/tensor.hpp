@@ -97,7 +97,7 @@ namespace tc
         constexpr auto &operator()(std::convertible_to<index_type> auto... indices)
             requires(sizeof...(indices) == shapes_sequence_type::size())
         {
-            return _values[order_type::flatten(shapes_array, shapes_type{static_cast<index_type>(indices)...})];
+            return _values[order_type::flatten(shapes(), shapes_type{static_cast<index_type>(indices)...})];
         }
 
         constexpr const auto &operator()(std::convertible_to<index_type> auto... indices) const
@@ -186,7 +186,7 @@ namespace tc
 
         constexpr auto shape(index_type dimension) const noexcept
         {
-            return shapes_array.at(dimension);
+            return shapes()[dimension];
         }
 
         constexpr const auto &shapes() const noexcept
@@ -206,7 +206,7 @@ namespace tc
             for (index_type i = 0; i < size(); i++)
             {
                 // Get the indices from index
-                auto indices = order_type::expand(shapes_array, i);
+                auto indices = order_type::expand(shapes(), i);
 
                 // Swap the indices of Dim0 and Dim1
                 std::swap(indices[Dim0], indices[Dim1]);
