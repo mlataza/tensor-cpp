@@ -25,12 +25,6 @@ namespace tc
 
         static constexpr auto shapes_array = sequence::to_array<shapes_sequence_type>::value;
 
-        template <index_type... N>
-        static constexpr auto from_sequence(std::index_sequence<N...>)
-        {
-            return tensor<value_type, N...>{};
-        }
-
         template <typename ShapesRange, typename IndicesRange>
         static auto flatten(const ShapesRange &shapes, IndicesRange &&indices)
         {
@@ -213,7 +207,10 @@ namespace tc
                   typename out_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type>
         auto transpose() const noexcept
         {
-            auto out = from_sequence(out_shapes_sequence_type{});
+            auto out = []<index_type... N>(std::index_sequence<N...>)
+            {
+                return tensor<value_type, N...>{};
+            }(out_shapes_sequence_type{});
             indices_type indices;
 
             // Perform the transposition
@@ -249,7 +246,10 @@ namespace tc
             const auto lhs_size = size() / common_shape;
             const auto rhs_size = rhs.size() / common_shape;
 
-            auto out = from_sequence(out_shapes_sequence_type{});
+            auto out = []<index_type... N>(std::index_sequence<N...>)
+            {
+                return tensor<value_type, N...>{};
+            }(out_shapes_sequence_type{});
             std::array<index_type, out_shapes_sequence_type::size()> out_indices;
             indices_type lhs_indices;
             std::array<index_type, sizeof...(RShapes)> rhs_indices;
