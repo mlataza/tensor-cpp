@@ -128,6 +128,26 @@ namespace tc
             return _values.cend();
         }
 
+        auto rbegin() noexcept
+        {
+            return _values.rbegin();
+        }
+
+        auto rend() noexcept
+        {
+            return _values.rend();
+        }
+
+        auto crbegin() const noexcept
+        {
+            return _values.crbegin();
+        }
+
+        auto crend() const noexcept
+        {
+            return _values.crend();
+        }
+
         auto operator+(const tensor<value_type, Shapes...> &rhs) const
         {
             tensor<value_type, Shapes...> out;
