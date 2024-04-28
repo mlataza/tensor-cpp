@@ -99,6 +99,16 @@ namespace tc
             return _values.end();
         }
 
+        constexpr auto begin() const
+        {
+            return _values.begin();
+        }
+
+        constexpr auto end() const
+        {
+            return _values.end();
+        }
+
         constexpr auto cbegin() const
         {
             return _values.cbegin();
@@ -115,6 +125,16 @@ namespace tc
         }
 
         constexpr auto rend()
+        {
+            return _values.rend();
+        }
+
+        constexpr auto rbegin() const
+        {
+            return _values.rbegin();
+        }
+
+        constexpr auto rend() const
         {
             return _values.rend();
         }
