@@ -5,6 +5,7 @@
 #include <concepts>
 #include <iostream>
 #include <ranges>
+#include <algorithm>
 
 #include "sequence.hpp"
 
@@ -35,7 +36,7 @@ namespace tc
         {
             index_type index = 0;
 
-            for (auto it = std::ranges::cbegin(shapes), iit = std::ranges::begin(indices); it != std::ranges::cend(shapes); ++it, ++iit)
+            for (auto it = shapes.cbegin(), iit = indices.begin(); it != shapes.cend(); ++it, ++iit)
             {
                 auto i = *iit;
                 auto n = *it;
@@ -54,7 +55,7 @@ namespace tc
         template <typename ShapesRange, typename IndicesRange>
         static auto expand(const ShapesRange &shapes, index_type index, IndicesRange &&indices)
         {
-            for (auto rit = std::ranges::crbegin(shapes), riit = std::ranges::rbegin(indices); rit != std::ranges::crend(shapes); ++rit, ++riit)
+            for (auto rit = shapes.crbegin(), riit = indices.rbegin(); rit != shapes.crend(); ++rit, ++riit)
             {
                 auto shape = *rit;
 
@@ -73,7 +74,7 @@ namespace tc
 
         explicit tensor(value_type value)
         {
-            std::fill(_values.begin(), _values.end(), value);
+            std::fill(begin(), end(), value);
         }
 
         constexpr auto rank() const noexcept
@@ -152,10 +153,7 @@ namespace tc
         {
             tensor<value_type, Shapes...> out;
 
-            for (auto ot = out.begin(), lt = cbegin(), rt = rhs.cbegin(); ot != out.end(); ot++, lt++, rt++)
-            {
-                *ot = *lt + *rt;
-            }
+            std::transform(cbegin(), cend(), rhs.cbegin(), out.begin(), std::plus{});
 
             return out;
         }
@@ -164,10 +162,7 @@ namespace tc
         {
             tensor<value_type, Shapes...> out;
 
-            for (auto ot = out.begin(), lt = cbegin(), rt = rhs.cbegin(); ot != out.end(); ot++, lt++, rt++)
-            {
-                *ot = *lt - *rt;
-            }
+            std::transform(cbegin(), cend(), rhs.cbegin(), out.begin(), std::minus{});
 
             return out;
         }
@@ -176,10 +171,8 @@ namespace tc
         {
             tensor<value_type, Shapes...> out;
 
-            for (auto ot = out.begin(), lt = cbegin(); ot != out.end(); ot++, lt++)
-            {
-                *ot = *lt * rhs;
-            }
+            std::transform(cbegin(), cend(), out.begin(), [rhs](auto val)
+                           { return val * rhs; });
 
             return out;
         }
@@ -188,10 +181,8 @@ namespace tc
         {
             tensor<value_type, Shapes...> out;
 
-            for (auto ot = out.begin(), rt = rhs.cbegin(); ot != out.end(); ot++, rt++)
-            {
-                *ot = lhs * *rt;
-            }
+            std::transform(rhs.cbegin(), rhs.cend(), out.begin(), [lhs](auto val)
+                           { return lhs * val; });
 
             return out;
         }
@@ -200,10 +191,8 @@ namespace tc
         {
             tensor<value_type, Shapes...> out;
 
-            for (auto ot = out.begin(), lt = cbegin(); ot != out.end(); ot++, lt++)
-            {
-                *ot = *lt / rhs;
-            }
+            std::transform(cbegin(), cend(), out.begin(), [rhs](auto val)
+                           { return val / rhs; });
 
             return out;
         }
@@ -281,10 +270,10 @@ namespace tc
                     for (index_type k = 0; k < common_shape; k++)
                     {
                         std::copy(lhs_trim_indices.begin(), lhs_trim_indices.end(), lhs_indices.begin());
-                        *std::ranges::rbegin(lhs_indices) = k;
+                        *lhs_indices.rbegin() = k;
 
                         std::copy(rhs_trim_indices.begin(), rhs_trim_indices.end(), rhs_indices.begin() + 1);
-                        *std::ranges::begin(rhs_indices) = k;
+                        *rhs_indices.begin() = k;
 
                         auto ii = flatten(shapes(), lhs_indices);
                         auto jj = flatten(rhs.shapes(), rhs_indices);
