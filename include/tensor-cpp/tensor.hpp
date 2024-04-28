@@ -89,16 +89,6 @@ namespace tc
             return *this(indices...);
         }
 
-        constexpr auto &operator[](index_type index)
-        {
-            return _values[index];
-        }
-
-        constexpr const auto &operator[](index_type index) const
-        {
-            return _values[index];
-        }
-
         constexpr auto begin()
         {
             return _values.begin();
@@ -244,7 +234,7 @@ namespace tc
             auto j = t.flatten(out.shapes(), indices);
 
             // Copy value to result
-            out[j] = t[i];
+            *(out.begin() + j) = *(t.cbegin() + i);
         }
 
         return out;
@@ -305,11 +295,11 @@ namespace tc
                     auto ii = lhs.flatten(lhs.shapes(), lhs_indices);
                     auto jj = rhs.flatten(rhs.shapes(), rhs_indices);
 
-                    value += lhs[ii] * rhs[jj];
+                    value += *(lhs.cbegin() + ii) * *(rhs.cbegin() + jj);
                 }
 
                 auto index = out.flatten(out.shapes(), out_indices);
-                out[index] = value;
+                *(out.begin() + index) = value;
             }
         }
 

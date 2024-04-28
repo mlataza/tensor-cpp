@@ -31,7 +31,7 @@ int main()
     assert(mul.shape(1) == m2.shape(1));
     for (auto i = 0; i < mul.size(); i++)
     {
-        assert(mul[i] == (i + 1));
+        assert(*(mul.cbegin() + i) == (i + 1));
     }
 
     return 0;
