@@ -6,12 +6,12 @@ using namespace tc;
 
 int main()
 {
-    tensor<3> t1(4.0, 5.0, 6.0);
+    tensor<3> t1{4.0, 5.0, 6.0};
     assert(t1(0) == 4);
     assert(t1(1) == 5);
     assert(t1(2) == 6);
 
-    tensor<3, 3> t2(4.0, 5.0, 6.0, 4.0, 5.0, 6.0, 4.0, 5.0, 6.0);
+    tensor<3, 3> t2{4.0, 5.0, 6.0, 4.0, 5.0, 6.0, 4.0, 5.0, 6.0};
     assert(t2(0, 0) == 4);
     assert(t2(0, 1) == 5);
     assert(t2(0, 2) == 6);

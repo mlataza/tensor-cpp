@@ -6,8 +6,8 @@ using namespace tc;
 
 int main()
 {
-    tensor<3> t1(4.0, 5.0, 6.0);
-    tensor<3, 3> t2(4.0, 5.0, 6.0, 4.0, 5.0, 6.0, 4.0, 5.0, 6.0);
+    tensor<3> t1{4.0, 5.0, 6.0};
+    tensor<3, 3> t2{4.0, 5.0, 6.0, 4.0, 5.0, 6.0, 4.0, 5.0, 6.0};
 
     tensor sc1 = t1 * 0.5;
     assert(sc1(0) == 2.0);
@@ -36,7 +36,7 @@ int main()
     assert(sc3(2, 1) == 15);
     assert(sc3(2, 2) == 18);
 
-    tensor<3> t3(3.0, 4.0, 5.0);
+    tensor<3> t3{3.0, 4.0, 5.0};
 
     tensor sc4 = t3 / 2.0;
     assert(sc4(0) == 1.5);

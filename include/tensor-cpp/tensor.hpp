@@ -61,13 +61,12 @@ namespace tc
 
         explicit basic_tensor() : _values{} {}
 
-        explicit basic_tensor(std::same_as<value_type> auto... values)
-            requires(sizeof...(values) == container_size)
-            : _values{values...}
+        explicit basic_tensor(std::initializer_list<value_type> list) : basic_tensor()
         {
+            std::copy(list.begin(), list.end(), begin());
         }
 
-        explicit basic_tensor(value_type value)
+        explicit basic_tensor(value_type value): basic_tensor()
         {
             std::fill(begin(), end(), value);
         }
