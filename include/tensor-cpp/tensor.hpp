@@ -86,7 +86,7 @@ namespace tc
         constexpr const auto &operator()(std::convertible_to<index_type> auto... indices) const
             requires(sizeof...(indices) == shapes_sequence_type::size())
         {
-            return *this(indices...);
+            return _values[flatten(shapes(), std::array<index_type, shapes_sequence_type::size()>{static_cast<index_type>(indices)...})];
         }
 
         constexpr auto begin()
