@@ -158,6 +158,12 @@ namespace tc
             return out;
         }
 
+        constexpr auto &operator+=(const type &rhs)
+        {
+            std::transform(cbegin(), cend(), rhs.cbegin(), begin(), std::plus{});
+            return *this;
+        }
+
         constexpr auto operator-(const type &rhs) const
         {
             type out;
@@ -165,6 +171,12 @@ namespace tc
             std::transform(cbegin(), cend(), rhs.cbegin(), out.begin(), std::minus{});
 
             return out;
+        }
+
+        constexpr auto &operator-=(const type &rhs)
+        {
+            std::transform(cbegin(), cend(), rhs.cbegin(), begin(), std::minus{});
+            return *this;
         }
 
         constexpr auto operator*(ValueType rhs) const
@@ -175,6 +187,13 @@ namespace tc
                            { return val * rhs; });
 
             return out;
+        }
+
+        constexpr auto &operator*=(ValueType rhs)
+        {
+            std::transform(cbegin(), cend(), begin(), [rhs](auto val)
+                           { return val * rhs; });
+            return *this;
         }
 
         constexpr friend auto operator*(ValueType lhs, const type &rhs)
@@ -195,6 +214,13 @@ namespace tc
                            { return val / rhs; });
 
             return out;
+        }
+
+        constexpr auto &operator/=(ValueType rhs)
+        {
+            std::transform(cbegin(), cend(), begin(), [rhs](auto val)
+                           { return val / rhs; });
+            return *this;
         }
 
         constexpr auto shape(index_type dimension) const

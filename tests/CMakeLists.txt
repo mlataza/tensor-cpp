@@ -41,3 +41,7 @@ add_test(NAME transpose COMMAND transpose)
 add_executable(multiplication multiplication.cpp)
 target_link_libraries(multiplication tensor-cpp)
 add_test(NAME multiplication COMMAND multiplication)
+
+add_executable(assignment assignment.cpp)
+target_link_libraries(assignment tensor-cpp)
+add_test(NAME assignment COMMAND assignment)
