@@ -13,10 +13,11 @@ namespace tc
 {
     template <typename ValueType, std::size_t... Shapes>
         requires(std::is_arithmetic_v<ValueType>)
-    struct tensor
+    struct basic_tensor
     {
         static constexpr auto container_size = (Shapes * ... * 1);
 
+        using type = basic_tensor<ValueType, Shapes...>;
         using value_type = ValueType;
         using index_type = std::size_t;
         using shapes_sequence_type = std::index_sequence<Shapes...>;
@@ -58,15 +59,15 @@ namespace tc
             }
         }
 
-        explicit tensor() : _values{} {}
+        explicit basic_tensor() : _values{} {}
 
-        explicit tensor(std::same_as<value_type> auto... values)
+        explicit basic_tensor(std::same_as<value_type> auto... values)
             requires(sizeof...(values) == container_size)
             : _values{values...}
         {
         }
 
-        explicit tensor(value_type value)
+        explicit basic_tensor(value_type value)
         {
             std::fill(begin(), end(), value);
         }
@@ -143,18 +144,18 @@ namespace tc
             return _values.crend();
         }
 
-        auto operator+(const tensor<value_type, Shapes...> &rhs) const
+        auto operator+(const type &rhs) const
         {
-            tensor<value_type, Shapes...> out;
+            type out;
 
             std::transform(cbegin(), cend(), rhs.cbegin(), out.begin(), std::plus{});
 
             return out;
         }
 
-        auto operator-(const tensor<value_type, Shapes...> &rhs) const
+        auto operator-(const type &rhs) const
         {
-            tensor<value_type, Shapes...> out;
+            type out;
 
             std::transform(cbegin(), cend(), rhs.cbegin(), out.begin(), std::minus{});
 
@@ -163,7 +164,7 @@ namespace tc
 
         auto operator*(value_type rhs) const
         {
-            tensor<value_type, Shapes...> out;
+            type out;
 
             std::transform(cbegin(), cend(), out.begin(), [rhs](auto val)
                            { return val * rhs; });
@@ -171,9 +172,9 @@ namespace tc
             return out;
         }
 
-        friend auto operator*(value_type lhs, const tensor<value_type, Shapes...> &rhs)
+        friend auto operator*(value_type lhs, const type &rhs)
         {
-            tensor<value_type, Shapes...> out;
+            type out;
 
             std::transform(rhs.cbegin(), rhs.cend(), out.begin(), [lhs](auto val)
                            { return lhs * val; });
@@ -183,7 +184,7 @@ namespace tc
 
         auto operator/(value_type rhs) const
         {
-            tensor<value_type, Shapes...> out;
+            type out;
 
             std::transform(cbegin(), cend(), out.begin(), [rhs](auto val)
                            { return val / rhs; });
@@ -209,7 +210,7 @@ namespace tc
         {
             auto out = []<index_type... N>(std::index_sequence<N...>)
             {
-                return tensor<value_type, N...>{};
+                return basic_tensor<value_type, N...>{};
             }(out_shapes_sequence_type{});
             indices_type indices;
 
@@ -238,7 +239,7 @@ namespace tc
                   typename rhs_trim_shapes_sequence_type = sequence::trim_first<rhs_shapes_sequence_type>::type,
                   typename out_shapes_sequence_type = sequence::cat<lhs_trim_shapes_sequence_type, rhs_trim_shapes_sequence_type>::type>
             requires((Shapes, ...) == sequence::first<rhs_shapes_sequence_type>::value)
-        auto operator*(const tensor<value_type, RShapes...> &rhs) const noexcept
+        auto operator*(const basic_tensor<value_type, RShapes...> &rhs) const noexcept
         {
             const auto common_shape = (Shapes, ...);
             const auto lhs_shapes = sequence::to_array<lhs_trim_shapes_sequence_type>::value;
@@ -248,14 +249,14 @@ namespace tc
 
             auto out = []<index_type... N>(std::index_sequence<N...>)
             {
-                return tensor<value_type, N...>{};
+                return basic_tensor<value_type, N...>{};
             }(out_shapes_sequence_type{});
 
             std::array<index_type, out_shapes_sequence_type::size()> out_indices;
-            
+
             indices_type lhs_indices;
             std::array<index_type, sizeof...(RShapes)> rhs_indices;
-            
+
             std::array<index_type, lhs_trim_shapes_sequence_type::size()> lhs_trim_indices;
             std::array<index_type, rhs_trim_shapes_sequence_type::size()> rhs_trim_indices;
 
@@ -296,6 +297,18 @@ namespace tc
     private:
         container_type _values;
     };
+
+    template <std::size_t... Shapes>
+    using tensor = basic_tensor<double, Shapes...>;
+
+    template <std::size_t... Shapes>
+    using tensor_f = basic_tensor<float, Shapes...>;
+
+    template <std::size_t... Shapes>
+    using tensor_i = basic_tensor<int, Shapes...>;
+
+    template <std::size_t... Shapes>
+    using tensor_l = basic_tensor<long, Shapes...>;
 
 }
 

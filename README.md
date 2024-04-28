@@ -12,7 +12,7 @@ using namespace tc;
 
 int main()
 {
-    tensor<double, 3> pos{1.0, 2.0, 3.0};
+    tensor<3> pos{1.0, 2.0, 3.0};
 
     std::cout << "pos = {" 
               << pos(0) << ", " 

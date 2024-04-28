@@ -6,12 +6,12 @@ using namespace tc;
 
 int main()
 {
-    tensor<int> v0;          
-    tensor<int, 3> v1(1, 2, 3);       
-    tensor<int, 3, 3> v2(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    tensor<> v0;          
+    tensor<3> v1(1.0, 2.0, 3.0);       
+    tensor<3, 3> v2(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0);
 
-    tensor<int, 3> t1(4, 5, 6);
-    tensor<int, 3, 3> t2(4, 5, 6, 4, 5, 6, 4, 5, 6);
+    tensor<3> t1(4.0, 5.0, 6.0);
+    tensor<3, 3> t2(4.0, 5.0, 6.0, 4.0, 5.0, 6.0, 4.0, 5.0, 6.0);
 
     tensor sum1 = t1 + v1;
     assert(sum1(0) == 5);

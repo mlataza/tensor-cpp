@@ -6,7 +6,7 @@ using namespace tc;
 
 int main()
 {
-    tensor<int, 3> v1(3);
+    tensor<3> v1(3);
 
     for (auto v : v1)
     {
@@ -18,7 +18,7 @@ int main()
         assert(*it == 3);
     }
 
-    tensor<int, 3, 3> v2(6);
+    tensor<3, 3> v2(6);
 
     for (auto v : v2)
     {

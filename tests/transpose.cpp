@@ -7,7 +7,7 @@ using namespace tc;
 int main()
 {
     // 2d tensor transpose
-    tensor<int, 2, 3> m(1, 2, 3, 4, 5, 6);
+    tensor<2, 3> m(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
 
     auto m_p = m.transpose<0, 1>();
 
@@ -36,7 +36,7 @@ int main()
     }
 
     // 3d tensor transpose
-    tensor<int, 2, 3, 2> t(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+    tensor<2, 3, 2> t(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0);
 
     auto t1 = t.transpose<0, 1>();
 
