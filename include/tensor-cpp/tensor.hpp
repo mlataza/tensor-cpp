@@ -246,7 +246,7 @@ namespace tc
         using lhs_shapes_sequence_type = std::index_sequence<LShapes...>;
         using rhs_shapes_sequence_type = std::index_sequence<RShapes...>;
 
-        static_assert(sequence::last<lhs_shapes_sequence_type>::value == sequence::first<rhs_shapes_sequence_type>::value, "LHS last shape doesn't match RHS first shape.");
+        static_assert(sequence::last<lhs_shapes_sequence_type>::value == sequence::first<rhs_shapes_sequence_type>::value, "LHS last shape matches RHS first shape.");
 
         using lhs_trim_shapes_sequence_type = sequence::trim_last<lhs_shapes_sequence_type>::type;
         using rhs_trim_shapes_sequence_type = sequence::trim_first<rhs_shapes_sequence_type>::type;

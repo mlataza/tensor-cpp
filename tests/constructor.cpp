@@ -27,5 +27,15 @@ int main()
     assert(tt1(1) == 1.5);
     assert(tt1(2) == 1.5);
 
+    tensor<3> t_uv{1.0, 2.0};
+    assert(t_uv(0) == 1.0);
+    assert(t_uv(1) == 2.0);
+    assert(t_uv(2) == 0.0);
+
+    tensor<3> t_ov{1.0, 2.0, 3.0, 4.0};
+    assert(t_ov(0) == 1.0);
+    assert(t_ov(1) == 2.0);
+    assert(t_ov(2) == 3.0);
+
     return 0;
 }
