@@ -250,9 +250,12 @@ namespace tc
             {
                 return tensor<value_type, N...>{};
             }(out_shapes_sequence_type{});
+
             std::array<index_type, out_shapes_sequence_type::size()> out_indices;
+            
             indices_type lhs_indices;
             std::array<index_type, sizeof...(RShapes)> rhs_indices;
+            
             std::array<index_type, lhs_trim_shapes_sequence_type::size()> lhs_trim_indices;
             std::array<index_type, rhs_trim_shapes_sequence_type::size()> rhs_trim_indices;
 
@@ -260,19 +263,20 @@ namespace tc
             for (index_type i = 0; i < lhs_size; i++)
             {
                 expand(lhs_shapes, i, lhs_trim_indices);
+                std::copy(lhs_trim_indices.cbegin(), lhs_trim_indices.cend(), lhs_indices.begin());
+                std::copy(lhs_trim_indices.cbegin(), lhs_trim_indices.cend(), out_indices.begin());
 
                 for (index_type j = 0; j < rhs_size; j++)
                 {
                     expand(rhs_shapes, j, rhs_trim_indices);
+                    std::copy(rhs_trim_indices.cbegin(), rhs_trim_indices.cend(), rhs_indices.begin() + 1);
+                    std::copy(rhs_trim_indices.cbegin(), rhs_trim_indices.cend(), out_indices.begin() + lhs_trim_indices.size());
 
                     value_type value{};
 
                     for (index_type k = 0; k < common_shape; k++)
                     {
-                        std::copy(lhs_trim_indices.begin(), lhs_trim_indices.end(), lhs_indices.begin());
                         *lhs_indices.rbegin() = k;
-
-                        std::copy(rhs_trim_indices.begin(), rhs_trim_indices.end(), rhs_indices.begin() + 1);
                         *rhs_indices.begin() = k;
 
                         auto ii = flatten(shapes(), lhs_indices);
@@ -280,9 +284,6 @@ namespace tc
 
                         value += _values[ii] * rhs[jj];
                     }
-
-                    std::copy(lhs_trim_indices.begin(), lhs_trim_indices.end(), out_indices.begin());
-                    std::copy(rhs_trim_indices.begin(), rhs_trim_indices.end(), out_indices.begin() + lhs_trim_indices.size());
 
                     auto index = flatten(out.shapes(), out_indices);
                     out[index] = value;
