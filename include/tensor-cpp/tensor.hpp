@@ -55,24 +55,24 @@ namespace tc
             }
         }
 
-        explicit basic_tensor() : _values{} {}
+        constexpr explicit basic_tensor() : _values{} {}
 
-        explicit basic_tensor(std::initializer_list<ValueType> list) : basic_tensor()
+        constexpr explicit basic_tensor(std::initializer_list<ValueType> list) : basic_tensor()
         {
             std::copy(list.begin(), list.end(), begin());
         }
 
-        explicit basic_tensor(ValueType value) : basic_tensor()
+        constexpr explicit basic_tensor(ValueType value) : basic_tensor()
         {
             std::fill(begin(), end(), value);
         }
 
-        constexpr auto rank() const noexcept
+        constexpr auto rank() const
         {
             return shapes_sequence_type::size();
         }
 
-        constexpr auto size() const noexcept
+        constexpr auto size() const
         {
             return _values.size();
         }
@@ -99,47 +99,47 @@ namespace tc
             return _values[index];
         }
 
-        auto begin() noexcept
+        constexpr auto begin()
         {
             return _values.begin();
         }
 
-        auto end() noexcept
+        constexpr auto end()
         {
             return _values.end();
         }
 
-        auto cbegin() const noexcept
+        constexpr auto cbegin() const
         {
             return _values.cbegin();
         }
 
-        auto cend() const noexcept
+        constexpr auto cend() const
         {
             return _values.cend();
         }
 
-        auto rbegin() noexcept
+        constexpr auto rbegin()
         {
             return _values.rbegin();
         }
 
-        auto rend() noexcept
+        constexpr auto rend()
         {
             return _values.rend();
         }
 
-        auto crbegin() const noexcept
+        constexpr auto crbegin() const
         {
             return _values.crbegin();
         }
 
-        auto crend() const noexcept
+        constexpr auto crend() const
         {
             return _values.crend();
         }
 
-        auto operator+(const type &rhs) const
+        constexpr auto operator+(const type &rhs) const
         {
             type out;
 
@@ -148,7 +148,7 @@ namespace tc
             return out;
         }
 
-        auto operator-(const type &rhs) const
+        constexpr auto operator-(const type &rhs) const
         {
             type out;
 
@@ -157,7 +157,7 @@ namespace tc
             return out;
         }
 
-        auto operator*(ValueType rhs) const
+        constexpr auto operator*(ValueType rhs) const
         {
             type out;
 
@@ -167,7 +167,7 @@ namespace tc
             return out;
         }
 
-        friend auto operator*(ValueType lhs, const type &rhs)
+        constexpr friend auto operator*(ValueType lhs, const type &rhs)
         {
             type out;
 
@@ -177,7 +177,7 @@ namespace tc
             return out;
         }
 
-        auto operator/(ValueType rhs) const
+        constexpr auto operator/(ValueType rhs) const
         {
             type out;
 
@@ -187,12 +187,12 @@ namespace tc
             return out;
         }
 
-        constexpr auto shape(index_type dimension) const noexcept
+        constexpr auto shape(index_type dimension) const
         {
             return shapes()[dimension];
         }
 
-        constexpr const auto &shapes() const noexcept
+        constexpr const auto &shapes() const
         {
             return sequence::to_array<shapes_sequence_type>::value;
         }
@@ -220,7 +220,7 @@ namespace tc
     };
 
     template <std::size_t Dim0, std::size_t Dim1, typename ValueType, std::size_t... Shapes>
-    auto transpose(const basic_tensor<ValueType, Shapes...> &t) noexcept
+    auto transpose(const basic_tensor<ValueType, Shapes...> &t)
     {
         using shapes_sequence_type = std::index_sequence<Shapes...>;
         using shapes_index_sequence_type = std::make_index_sequence<shapes_sequence_type::size()>;
