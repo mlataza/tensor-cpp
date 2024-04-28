@@ -202,37 +202,6 @@ namespace tc
             return shapes_array;
         }
 
-        template <index_type Dim0, index_type Dim1,
-                  typename shapes_index_sequence_type = std::make_index_sequence<shapes_sequence_type::size()>,
-                  typename transposed_shapes_index_sequence_type = sequence::transpose<Dim0, Dim1, shapes_index_sequence_type>::type,
-                  typename out_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type>
-        auto transpose() const noexcept
-        {
-            auto out = []<index_type... N>(std::index_sequence<N...>)
-            {
-                return basic_tensor<value_type, N...>{};
-            }(out_shapes_sequence_type{});
-            indices_type indices;
-
-            // Perform the transposition
-            for (index_type i = 0; i < size(); i++)
-            {
-                // Get the indices from index
-                expand(shapes(), i, indices);
-
-                // Swap the indices of Dim0 and Dim1
-                std::swap(indices[Dim0], indices[Dim1]);
-
-                // Compute the new index for the result
-                auto j = flatten(out.shapes(), indices);
-
-                // Copy value to result
-                out[j] = _values[i];
-            }
-
-            return out;
-        }
-
         template <index_type... RShapes,
                   typename rhs_shapes_sequence_type = std::index_sequence<RShapes...>,
                   typename lhs_trim_shapes_sequence_type = sequence::trim_last<shapes_sequence_type>::type,
@@ -309,6 +278,46 @@ namespace tc
 
     template <std::size_t... Shapes>
     using tensor_l = basic_tensor<long, Shapes...>;
+
+    template <typename ValueType, typename Seq>
+    struct __tensor_from_sequence;
+
+    template <typename ValueType, std::size_t... N>
+    struct __tensor_from_sequence<ValueType, std::index_sequence<N...>>
+    {
+        using type = basic_tensor<ValueType, N...>;
+    };
+
+    template <std::size_t Dim0, std::size_t Dim1, typename ValueType, std::size_t... Shapes>
+    auto transpose(const basic_tensor<ValueType, Shapes...> &t) noexcept
+    {
+        using shapes_sequence_type = std::index_sequence<Shapes...>;
+        using shapes_index_sequence_type = std::make_index_sequence<shapes_sequence_type::size()>;
+        using transposed_shapes_index_sequence_type = sequence::transpose<Dim0, Dim1, shapes_index_sequence_type>::type;
+        using out_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type;
+        using out_type = __tensor_from_sequence<ValueType, out_shapes_sequence_type>::type;
+
+        out_type out;
+        std::array<std::size_t, shapes_sequence_type::size()> indices;
+
+        // Perform the transposition
+        for (std::size_t i = 0; i < t.size(); i++)
+        {
+            // Get the indices from index
+            t.expand(t.shapes(), i, indices);
+
+            // Swap the indices of Dim0 and Dim1
+            std::swap(indices[Dim0], indices[Dim1]);
+
+            // Compute the new index for the result
+            auto j = t.flatten(out.shapes(), indices);
+
+            // Copy value to result
+            out[j] = t[i];
+        }
+
+        return out;
+    }
 
 }
 
