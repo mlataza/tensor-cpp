@@ -13,18 +13,14 @@ namespace tc
 {
     template <typename ValueType, std::size_t... Shapes>
         requires(std::is_arithmetic_v<ValueType>)
-    struct basic_tensor
+    class basic_tensor
     {
-        static constexpr auto container_size = (Shapes * ... * 1);
+        std::array<ValueType, (Shapes * ... * 1)> _values;
 
+    public:
         using type = basic_tensor<ValueType, Shapes...>;
-        using value_type = ValueType;
         using index_type = std::size_t;
         using shapes_sequence_type = std::index_sequence<Shapes...>;
-        using indices_type = std::array<index_type, shapes_sequence_type::size()>;
-        using container_type = std::array<value_type, container_size>;
-
-        static constexpr auto shapes_array = sequence::to_array<shapes_sequence_type>::value;
 
         template <typename ShapesRange, typename IndicesRange>
         static auto flatten(const ShapesRange &shapes, IndicesRange &&indices)
@@ -61,12 +57,12 @@ namespace tc
 
         explicit basic_tensor() : _values{} {}
 
-        explicit basic_tensor(std::initializer_list<value_type> list) : basic_tensor()
+        explicit basic_tensor(std::initializer_list<ValueType> list) : basic_tensor()
         {
             std::copy(list.begin(), list.end(), begin());
         }
 
-        explicit basic_tensor(value_type value): basic_tensor()
+        explicit basic_tensor(ValueType value) : basic_tensor()
         {
             std::fill(begin(), end(), value);
         }
@@ -78,13 +74,13 @@ namespace tc
 
         constexpr auto size() const noexcept
         {
-            return container_size;
+            return _values.size();
         }
 
         constexpr auto &operator()(std::convertible_to<index_type> auto... indices)
             requires(sizeof...(indices) == shapes_sequence_type::size())
         {
-            return _values[flatten(shapes(), indices_type{static_cast<index_type>(indices)...})];
+            return _values[flatten(shapes(), std::array<index_type, shapes_sequence_type::size()>{static_cast<index_type>(indices)...})];
         }
 
         constexpr const auto &operator()(std::convertible_to<index_type> auto... indices) const
@@ -161,7 +157,7 @@ namespace tc
             return out;
         }
 
-        auto operator*(value_type rhs) const
+        auto operator*(ValueType rhs) const
         {
             type out;
 
@@ -171,7 +167,7 @@ namespace tc
             return out;
         }
 
-        friend auto operator*(value_type lhs, const type &rhs)
+        friend auto operator*(ValueType lhs, const type &rhs)
         {
             type out;
 
@@ -181,7 +177,7 @@ namespace tc
             return out;
         }
 
-        auto operator/(value_type rhs) const
+        auto operator/(ValueType rhs) const
         {
             type out;
 
@@ -198,11 +194,8 @@ namespace tc
 
         constexpr const auto &shapes() const noexcept
         {
-            return shapes_array;
+            return sequence::to_array<shapes_sequence_type>::value;
         }
-
-    private:
-        container_type _values;
     };
 
     template <std::size_t... Shapes>
