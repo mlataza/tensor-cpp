@@ -77,6 +77,15 @@ namespace tc::sequence
     };
 
     template <typename Seq>
+    struct last;
+
+    template <std::size_t... N>
+    struct last<std::index_sequence<N...>>
+    {
+        static constexpr auto value = (N, ...);
+    };
+
+    template <typename Seq>
     struct trim_last;
 
     template <std::size_t... N>

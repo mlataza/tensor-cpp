@@ -202,67 +202,6 @@ namespace tc
             return shapes_array;
         }
 
-        template <index_type... RShapes,
-                  typename rhs_shapes_sequence_type = std::index_sequence<RShapes...>,
-                  typename lhs_trim_shapes_sequence_type = sequence::trim_last<shapes_sequence_type>::type,
-                  typename rhs_trim_shapes_sequence_type = sequence::trim_first<rhs_shapes_sequence_type>::type,
-                  typename out_shapes_sequence_type = sequence::cat<lhs_trim_shapes_sequence_type, rhs_trim_shapes_sequence_type>::type>
-            requires((Shapes, ...) == sequence::first<rhs_shapes_sequence_type>::value)
-        auto operator*(const basic_tensor<value_type, RShapes...> &rhs) const noexcept
-        {
-            const auto common_shape = (Shapes, ...);
-            const auto lhs_shapes = sequence::to_array<lhs_trim_shapes_sequence_type>::value;
-            const auto rhs_shapes = sequence::to_array<rhs_trim_shapes_sequence_type>::value;
-            const auto lhs_size = size() / common_shape;
-            const auto rhs_size = rhs.size() / common_shape;
-
-            auto out = []<index_type... N>(std::index_sequence<N...>)
-            {
-                return basic_tensor<value_type, N...>{};
-            }(out_shapes_sequence_type{});
-
-            std::array<index_type, out_shapes_sequence_type::size()> out_indices;
-
-            indices_type lhs_indices;
-            std::array<index_type, sizeof...(RShapes)> rhs_indices;
-
-            std::array<index_type, lhs_trim_shapes_sequence_type::size()> lhs_trim_indices;
-            std::array<index_type, rhs_trim_shapes_sequence_type::size()> rhs_trim_indices;
-
-            // Perform tensor multiplication
-            for (index_type i = 0; i < lhs_size; i++)
-            {
-                expand(lhs_shapes, i, lhs_trim_indices);
-                std::copy(lhs_trim_indices.cbegin(), lhs_trim_indices.cend(), lhs_indices.begin());
-                std::copy(lhs_trim_indices.cbegin(), lhs_trim_indices.cend(), out_indices.begin());
-
-                for (index_type j = 0; j < rhs_size; j++)
-                {
-                    expand(rhs_shapes, j, rhs_trim_indices);
-                    std::copy(rhs_trim_indices.cbegin(), rhs_trim_indices.cend(), rhs_indices.begin() + 1);
-                    std::copy(rhs_trim_indices.cbegin(), rhs_trim_indices.cend(), out_indices.begin() + lhs_trim_indices.size());
-
-                    value_type value{};
-
-                    for (index_type k = 0; k < common_shape; k++)
-                    {
-                        *lhs_indices.rbegin() = k;
-                        *rhs_indices.begin() = k;
-
-                        auto ii = flatten(shapes(), lhs_indices);
-                        auto jj = flatten(rhs.shapes(), rhs_indices);
-
-                        value += _values[ii] * rhs[jj];
-                    }
-
-                    auto index = flatten(out.shapes(), out_indices);
-                    out[index] = value;
-                }
-            }
-
-            return out;
-        }
-
     private:
         container_type _values;
     };
@@ -280,10 +219,10 @@ namespace tc
     using tensor_l = basic_tensor<long, Shapes...>;
 
     template <typename ValueType, typename Seq>
-    struct __tensor_from_sequence;
+    struct tensor_sequence;
 
     template <typename ValueType, std::size_t... N>
-    struct __tensor_from_sequence<ValueType, std::index_sequence<N...>>
+    struct tensor_sequence<ValueType, std::index_sequence<N...>>
     {
         using type = basic_tensor<ValueType, N...>;
     };
@@ -295,7 +234,7 @@ namespace tc
         using shapes_index_sequence_type = std::make_index_sequence<shapes_sequence_type::size()>;
         using transposed_shapes_index_sequence_type = sequence::transpose<Dim0, Dim1, shapes_index_sequence_type>::type;
         using out_shapes_sequence_type = sequence::get<shapes_sequence_type, transposed_shapes_index_sequence_type>::type;
-        using out_type = __tensor_from_sequence<ValueType, out_shapes_sequence_type>::type;
+        using out_type = tensor_sequence<ValueType, out_shapes_sequence_type>::type;
 
         out_type out;
         std::array<std::size_t, shapes_sequence_type::size()> indices;
@@ -314,6 +253,72 @@ namespace tc
 
             // Copy value to result
             out[j] = t[i];
+        }
+
+        return out;
+    }
+
+    template <typename ValueType, std::size_t... LShapes, std::size_t... RShapes>
+    auto operator*(const basic_tensor<ValueType, LShapes...> &lhs, const basic_tensor<ValueType, RShapes...> &rhs)
+    {
+        using lhs_shapes_sequence_type = std::index_sequence<LShapes...>;
+        using rhs_shapes_sequence_type = std::index_sequence<RShapes...>;
+
+        static_assert(sequence::last<lhs_shapes_sequence_type>::value == sequence::first<rhs_shapes_sequence_type>::value, "LHS last shape doesn't match RHS first shape.");
+
+        using lhs_trim_shapes_sequence_type = sequence::trim_last<lhs_shapes_sequence_type>::type;
+        using rhs_trim_shapes_sequence_type = sequence::trim_first<rhs_shapes_sequence_type>::type;
+
+        using out_shapes_sequence_type = sequence::cat<lhs_trim_shapes_sequence_type, rhs_trim_shapes_sequence_type>::type;
+        using out_type = tensor_sequence<ValueType, out_shapes_sequence_type>::type;
+
+        const auto common_shape = (LShapes, ...);
+
+        const auto lhs_shapes = sequence::to_array<lhs_trim_shapes_sequence_type>::value;
+        const auto rhs_shapes = sequence::to_array<rhs_trim_shapes_sequence_type>::value;
+
+        const auto lhs_size = lhs.size() / common_shape;
+        const auto rhs_size = rhs.size() / common_shape;
+
+        out_type out;
+
+        std::array<std::size_t, out_shapes_sequence_type::size()> out_indices;
+
+        std::array<std::size_t, sizeof...(LShapes)> lhs_indices;
+        std::array<std::size_t, sizeof...(RShapes)> rhs_indices;
+
+        std::array<std::size_t, lhs_trim_shapes_sequence_type::size()> lhs_trim_indices;
+        std::array<std::size_t, rhs_trim_shapes_sequence_type::size()> rhs_trim_indices;
+
+        // Perform tensor multiplication
+        for (std::size_t i = 0; i < lhs_size; i++)
+        {
+            lhs.expand(lhs_shapes, i, lhs_trim_indices);
+            std::copy(lhs_trim_indices.cbegin(), lhs_trim_indices.cend(), lhs_indices.begin());
+            std::copy(lhs_trim_indices.cbegin(), lhs_trim_indices.cend(), out_indices.begin());
+
+            for (std::size_t j = 0; j < rhs_size; j++)
+            {
+                lhs.expand(rhs_shapes, j, rhs_trim_indices);
+                std::copy(rhs_trim_indices.cbegin(), rhs_trim_indices.cend(), rhs_indices.begin() + 1);
+                std::copy(rhs_trim_indices.cbegin(), rhs_trim_indices.cend(), out_indices.begin() + lhs_trim_indices.size());
+
+                ValueType value = 0;
+
+                for (std::size_t k = 0; k < common_shape; k++)
+                {
+                    *lhs_indices.rbegin() = k;
+                    *rhs_indices.begin() = k;
+
+                    auto ii = lhs.flatten(lhs.shapes(), lhs_indices);
+                    auto jj = rhs.flatten(rhs.shapes(), rhs_indices);
+
+                    value += lhs[ii] * rhs[jj];
+                }
+
+                auto index = out.flatten(out.shapes(), out_indices);
+                out[index] = value;
+            }
         }
 
         return out;
